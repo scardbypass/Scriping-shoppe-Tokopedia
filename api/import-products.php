@@ -1,0 +1,9 @@
+<?php
+declare(strict_types=1); header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__.'/../config.php'; const API_TOKEN='GANTI_TOKEN_RAHASIA';
+$auth=$_SERVER['HTTP_AUTHORIZATION']??''; if(!hash_equals('Bearer '.API_TOKEN,$auth)){http_response_code(401);exit(json_encode(['ok'=>false,'message'=>'Unauthorized']));}
+$in=json_decode(file_get_contents('php://input'),true)?:[]; if(!empty($in['ping']))exit(json_encode(['ok'=>true,'message'=>'API OK']));
+$products=$in['products']??[];$ok=0;
+$stmt=$conn->prepare("INSERT INTO products(item_id,shop_id,name,price,discount_price,stock_status,rating,sold,image_main,images,url,category,variations,scraped_at,marketplace,active) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1) ON DUPLICATE KEY UPDATE shop_id=VALUES(shop_id),name=VALUES(name),price=VALUES(price),discount_price=VALUES(discount_price),stock_status=VALUES(stock_status),rating=VALUES(rating),sold=VALUES(sold),image_main=VALUES(image_main),images=VALUES(images),url=VALUES(url),category=VALUES(category),variations=VALUES(variations),scraped_at=VALUES(scraped_at),marketplace=VALUES(marketplace),active=1");
+foreach($products as $p){$images=json_encode($p['images']??[]);$vars=json_encode($p['variations']??null);$item=(string)($p['item_id']??'');if($item==='')continue;$shop=(string)($p['shop_id']??'');$name=(string)($p['name']??'');$price=(float)($p['price']??0);$disc=(float)($p['discount_price']??0);$stock=(string)($p['stock_status']??'UNKNOWN');$rating=(float)($p['rating']??0);$sold=(int)($p['sold']??0);$main=(string)($p['image_main']??'');$url=(string)($p['url']??'');$cat=(string)($p['category']??'');$at=(string)($p['scraped_at']??date('c'));$market=(string)($p['marketplace']??'');$stmt->bind_param('sssddsdisssssss',$item,$shop,$name,$price,$disc,$stock,$rating,$sold,$main,$images,$url,$cat,$vars,$at,$market);if($stmt->execute())$ok++;}
+echo json_encode(['ok'=>true,'imported'=>$ok,'total'=>count($products)],JSON_UNESCAPED_UNICODE);

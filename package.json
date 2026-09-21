@@ -1,0 +1,39 @@
+{
+  "name": "ambil-produk-toko-scard-project",
+  "version": "13.0.0",
+  "description": "Ambil Produk Toko by SCARD-PROJECT",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win nsis"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "exceljs": "^4.4.0",
+    "playwright": "^1.55.0"
+  },
+  "devDependencies": {
+    "electron": "^38.1.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "id.scardproject.ambilproduktoko",
+    "productName": "Ambil Produk Toko",
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "api/**/*",
+      "examples/**/*",
+      "DOCS.md",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
